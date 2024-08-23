@@ -1,0 +1,14 @@
+### hello!
+
+GET http://localhost:3000
+
+POST http://localhost:3000/alunos
+Content-Type: application/json
+
+{
+    "nome": "João",
+    "endereco": "rua xx",
+    "telefone": "999999999",
+    "email": "joe@doe.com",
+    "data_nascimento": 2005,
+}
