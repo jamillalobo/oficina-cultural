@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAlunoDto } from '../../adapters/dto/create-aluno.dto';
 import { Aluno } from '../../domain/aluno.model';
-import { AlunoRepository } from '../inboundPortas/aluno.repository';
+import { AlunoRepository } from '../inboundPorts/aluno.repository';
 import { error } from 'console';
+import { CursoRepository } from 'src/cursos/application/inboundPorts/curso.repository';
 
 @Injectable()
 export class AlunosService {
 
   private idCounter: number;
 
-  constructor(private readonly alunoRepository: AlunoRepository) {
+  constructor(private readonly alunoRepository: AlunoRepository, private readonly cursoRepository: CursoRepository) {
   }
 
   async criarAluno(createAlunoDto: CreateAlunoDto) {
@@ -35,6 +36,31 @@ export class AlunosService {
     this.alunoRepository.salvarAluno(novoAluno);
   }
 
-  matricular(id: number, idCurso: number) {}
+  async matricular(email: string, idCurso: string) {
+    const aluno = this.alunoRepository.buscarAlunoPorEmail(email);
+
+    if (!aluno) {
+      throw new Error('Aluno não encontrado');
+    }
+
+    const curso = this.cursoRepository.buscarCursoPorId(idCurso)
+
+    if (!curso) {
+      throw new Error('Curso não encontrado');
+    }
+
+    const alunoMatriculado = {
+      ...aluno,
+      cursos: curso
+    }
+
+    const alunosNoCurso = {
+      ...curso,
+      alunos: aluno
+    }
+    
+    this.alunoRepository.atualizarAluno(email, await alunoMatriculado);
+    this.cursoRepository.atualizarCurso(await alunosNoCurso);
+  }
 
 }
