@@ -3,7 +3,7 @@ import { CreateAlunoDto } from '../../adapters/dto/create-aluno.dto';
 import { Aluno } from '../../domain/aluno.model';
 import { AlunoRepository } from '../inboundPorts/aluno.repository';
 import { error } from 'console';
-import { CursoRepository } from 'src/cursos/application/inboundPorts/curso.repository';
+import { CursoRepository } from '../../../cursos/application/inboundPorts/curso.repository';
 
 @Injectable()
 export class AlunosService {
@@ -13,7 +13,7 @@ export class AlunosService {
   constructor(private readonly alunoRepository: AlunoRepository, private readonly cursoRepository: CursoRepository) {
   }
 
-  async criarAluno(createAlunoDto: CreateAlunoDto) {
+  async criarAluno(createAlunoDto: CreateAlunoDto): Promise<Aluno> {
     const alunos = this.alunoRepository.listarAlunos();
 
     this.idCounter = (await alunos).length > 1 ? alunos[(await alunos).length - 1].id + 1 : 1;
@@ -26,7 +26,7 @@ export class AlunosService {
 
     const novoAluno: Aluno = {
       id: this.idCounter,
-      nome: createAlunoDto.name,
+      nome: createAlunoDto.nome,
       endereco: createAlunoDto.endereco,
       email: createAlunoDto.email,
       telefone: createAlunoDto.telefone,
@@ -34,9 +34,11 @@ export class AlunosService {
     }
 
     this.alunoRepository.salvarAluno(novoAluno);
+    
+    return novoAluno;
   }
 
-  async matricular(email: string, idCurso: string) {
+  async matricular(email: string, idCurso: string): Promise<Aluno> {
     const aluno = this.alunoRepository.buscarAlunoPorEmail(email);
 
     if (!aluno) {
@@ -49,18 +51,10 @@ export class AlunosService {
       throw new Error('Curso não encontrado');
     }
 
-    const alunoMatriculado = {
-      ...aluno,
-      cursos: curso
-    }
-
-    const alunosNoCurso = {
-      ...curso,
-      alunos: aluno
-    }
+    await this.alunoRepository.atualizarAluno(email, (await curso).titulo);
     
-    this.alunoRepository.atualizarAluno(email, await alunoMatriculado);
-    this.cursoRepository.atualizarCurso(await alunosNoCurso);
-  }
+    await this.cursoRepository.atualizarCurso(idCurso, (await aluno).nome);
 
+    return this.alunoRepository.buscarAlunoPorEmail(email); 
+  }
 }

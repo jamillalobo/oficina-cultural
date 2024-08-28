@@ -14,14 +14,14 @@ export class AlunoRepository{
       return Promise.resolve(this.alunos);
   };
 
-  async atualizarAluno(email: string, alunoMatriculado: Aluno): Promise<Aluno> {
+  async atualizarAluno(email: string, novoCurso: string): Promise<Aluno> {
     const estudante = this.alunos.find(aluno => aluno.email === email)
     
     if (!estudante) {
       throw new Error('Aluno não encontrado');
     }
 
-    estudante.cursos.push(...alunoMatriculado.cursos)
+    estudante.cursos.push(novoCurso);
 
     return await this.salvarAluno(estudante);
   }

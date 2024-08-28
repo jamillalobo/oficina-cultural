@@ -1,8 +1,8 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsString, Max } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateAlunoDto {
   @IsString()
-  name: string;
+  nome: string;
 
   @IsString()
   endereco: string;
@@ -14,7 +14,4 @@ export class CreateAlunoDto {
   @IsNotEmpty()
   email: string;
 
-  @IsNumber()
-  @Max( new Date().getFullYear() - 16)
-  idade: number;
 }

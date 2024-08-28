@@ -1,18 +1,21 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { CursosService } from './cursos.service';
+import { CursoRepository } from '../inboundPorts/curso.repository';
 
 describe('CursosService', () => {
-  let service: CursosService;
+  it('should create a curso', async () => {
+    const cursoRepository = new CursoRepository();
+    const service = new CursosService(cursoRepository);
+    
+    const esperado = {
+      idCurso: 1,
+      titulo: 'Curso Python',
+      descricao: 'Descricao A',
+      alunos: []
+    }
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [CursosService],
-    }).compile();
+    const resultado = await service.create({ titulo: 'Curso Python', descricao: 'Descricao A' });
 
-    service = module.get<CursosService>(CursosService);
-  });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(resultado).toEqual(esperado);
+  
   });
 });

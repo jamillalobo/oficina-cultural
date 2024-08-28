@@ -10,7 +10,7 @@ export class CursosService {
 
   constructor(private cursoRepository: CursoRepository) {}
 
-  async create(createCursoDto: CreateCursoDto) {
+  async create(createCursoDto: CreateCursoDto): Promise<Curso> {
     const cursos = this.cursoRepository.listarCursos();
 
     this.idCounter = (await cursos).length > 1 ? cursos[(await cursos).length - 1].id + 1 : 1;
@@ -23,6 +23,7 @@ export class CursosService {
     }
 
     this.cursoRepository.salvarCurso(novoCurso)
+    return novoCurso;
   }
 
   async findAll() : Promise<Curso[]> {

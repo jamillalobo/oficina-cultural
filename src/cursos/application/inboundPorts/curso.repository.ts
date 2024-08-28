@@ -1,5 +1,6 @@
+import { Curso } from './../../domain/curso.model';
 import { Injectable } from "@nestjs/common";
-import { Curso } from "../../domain/curso.model";
+
 
 @Injectable()
 export class CursoRepository{
@@ -14,22 +15,22 @@ export class CursoRepository{
     return Promise.resolve(this.cursos);
   };
 
-  async atualizarCurso(cursoComAlunos: Curso): Promise<Curso> {
+  async atualizarCurso(id: string, novoAluno: string): Promise<Curso> {
 
-    const cursoValido = this.cursos.find(curso => curso.idCurso === cursoComAlunos.idCurso);
-
-    if (!cursoValido) {
+    const curso = this.cursos.find(curso => curso.idCurso === Number(id));
+    
+    if (!curso) {
       throw new Error('Curso não encontrado');
     }
 
-    cursoValido.alunos.push(...cursoComAlunos.alunos)
-    
-    return await this.salvarCurso(cursoValido);
+    curso.alunos.push(novoAluno);
+
+    return await this.salvarCurso(curso);
   }
   
   buscarCursoPorId(id: string): Promise<Curso> {
-    const Curso = this.cursos.find(curso => curso.idCurso === Number(id))
-    return Promise.resolve(Curso)    
+    const curso = this.cursos.find(curso => curso.idCurso === Number(id))
+    return Promise.resolve(curso)    
   };
 
 }
